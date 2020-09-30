@@ -8,7 +8,7 @@ abstract class Backend {
 
     // Helper functions
     static public function redirect(string $redirect_to) {
-        header('Location: '.$location);
+        header('Location: '.$redirect_to);
         DataBase::destroyInstance();
         die();
     }
