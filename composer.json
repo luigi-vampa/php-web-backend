@@ -1,0 +1,12 @@
+{
+    "name": "galahad/public",
+    "authors": [
+        {
+            "name": "Analogcity Citizen",
+            "email": "who@knows.whom"
+        }
+    ],
+    "require": {
+        "twig/twig": "^3.0"
+    }
+}

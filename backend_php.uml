@@ -1,0 +1,139 @@
+@startuml
+
+'Notes
+interface SpecificController
+note right : "Every method is a valid action"
+
+'Relations
+together {
+    class homepageController
+    class loginController
+}
+
+together {
+    abstract class AuthController
+    abstract class SimpleController
+}
+
+Backend . DataBase : "Uses"
+Backend . InputUtils : "Uses"
+Controller . ControllerFactory : "Uses"
+AuthController . UserLvl : "Uses"
+homepageController .. InputUtils : "Uses"
+loginController .. DataBase : "Uses"
+loginController .. UserLvl : "Uses"
+loginController .. User : "Uses"
+loginController .. InputUtils : "Uses"
+Backend *-- Controller : "Creates"
+Controller "1" *-- SpecificController
+ControllerFactory .. SpecificController : "Creates"
+DataBase "1" *--  mysqli
+
+'Example classes
+class homepageController extends SimpleController implements SpecificController
+class loginController extends AuthController implements SpecificController
+
+'Main Class
+abstract class Backend {
+    {static} - controller : string
+    {static} - action : string
+    {static} - controller_obj : Controller
+    {static} + echo_debug(str : string)
+    {static} + redirect(redirect_to : string)
+    {static} + void main()
+}
+
+'Models
+interface SpecificController {
+    + void render()
+    + void execute()
+}
+
+abstract class AuthController extends SimpleController implements SpecificController {
+
+    - acces_level : int
+    - error_template : string
+    
+
+    # void register_user_acces(acces : int)
+    # void register_error_template(template : string)
+    + void render()
+    + void execute()
+
+}
+
+abstract class SimpleController implements SpecificController {
+
+    - template : string
+    - func_render : string
+    - param_template : array
+    - func_exec : string
+
+    # void plain_page()
+
+    - void default_render()
+    + void render()
+    # void register_param_template(params : array)
+    # void register_func_render(func_render : string) 
+    # void register_template(template : string)
+    
+    - void default_execution()    
+    + void execute()
+    # void register_func_executable(func : string)
+    # void register_redirect(redirect : string)   
+}
+
+abstract class Singleton {
+
+    {static} - instances : array
+    
+    - Singleton()
+    {abstract} # clean_up()
+    {static} + mixed getInstance()
+    {static} + void destroyInstance()
+
+}
+
+class Controller {
+    - controller : string
+    - action : string
+    - specific_controller : SpecificController
+    
+    + Controller(controller : string, action : string)
+    + void execute()
+    - void load_specific_controller()
+}
+
+'Utils
+abstract class ControllerFactory {
+    - ControllerFactory()
+    {static} + mixed load_controller(controller : string, ctrl_on_error : string) : SpecificController
+}
+
+class DataBase extends Singleton {
+    
+    {static} - servername : string
+    {static} - username : string
+    {static} - password : string
+    {static} - db_name : string
+
+    - conn : mysqli
+    - last_query_res : array
+
+    # DataBase()
+    # void clean_up()
+    + boolean safe_query(prepared_stmt : string, ordered_params : array, ordered_params_types : string, store_res : boolean)
+    + boolean unsafe_query(query : string, store_result : boolean)
+    + array get_result() 
+}
+
+abstract class InputUtils {
+    - InputUtils()
+    {static} + boolean validatePOST(vars_to_check : array)
+    {static} + boolean validateGET(vars_to_check : array)
+    {static} + int get_input_int(var_to_get : string, type_input : int)
+    {static} + string get_input_str(var_to_get : string, type_input : int)
+    
+}
+
+@enduml
